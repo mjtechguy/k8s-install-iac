@@ -1,0 +1,29 @@
+- name: Create Cloudflare API key secret
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: cloudflare-api-key-secret
+        namespace: cert-manager
+      type: Opaque
+      stringData:
+        api-token: "{{ cloudflare_api_key }}"
+
+- name: Apply ClusterIssuer
+  kubernetes.core.k8s:
+    definition: "{{ lookup('template', 'cluster-issuer.yml.j2') }}"
+
+- name: Apply Wildcard Certificate
+  kubernetes.core.k8s:
+    definition: "{{ lookup('template', 'wildcard-certificate.yml.j2') }}"
+
+- name: Wait for certificate secret to be created
+  kubernetes.core.k8s_info:
+    kind: Secret
+    name: default-wildcard-tls-cert
+    namespace: default
+  register: cert_secret
+  until: cert_secret.resources|length > 0
+  delay: 10
+  retries: 30

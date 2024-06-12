@@ -1,0 +1,25 @@
+---
+- name: Install k3s
+  shell: |
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -s - \
+        {% if disable_traefik %}--disable traefik{% endif %} \
+        {% for san in tls_sans.split(',') %} --tls-san {{ san }}{% endfor %}
+  register: k3s_install_result
+  changed_when: k3s_install_result.rc == 0
+
+- name: Copy kubeconfig to desired location
+  copy:
+    src: "{{ kubeconfig_path | default('/etc/rancher/k3s/k3s.yaml') }}"
+    dest: "{{ lookup('env', 'HOME') }}/.kube/config"
+    remote_src: true
+  become: true
+
+- name: Update server IP in kubeconfig
+  replace:
+    path: "{{ lookup('env', 'HOME') }}/.kube/config"
+    regexp: '127.0.0.1'
+    replace: "{{ tls_sans.split(',')[0] }}"
+
+- name: Sleep for 30 seconds to allow k3s to fully initialize
+  wait_for:
+    timeout: 30

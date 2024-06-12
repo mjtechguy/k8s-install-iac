@@ -1,0 +1,20 @@
+---
+k8s_distro: "k3s"
+k3s_version: "v1.28.10+k3s1"
+rke2_version: "v1.28.4+rke2r2"
+tls_sans: "example.com,www.example.com"
+disable_traefik: "true"
+kubeconfig_path: "/etc/rancher/k3s/k3s.yaml"
+ingress_nginx_replicas: 2
+helm_version: "v3.6.3"
+kubectl_version: "v1.21.0"
+k9s_version: "v0.24.10"
+rancher_version: "v2.5.8"
+rancher_hostname: "rancher.example.com"
+letsencrypt_email: "admin@example.com"
+cloudflare_api_key: "your-cloudflare-api-key"
+letsencrypt_env: "prod"
+base_domain: "example.com"
+wildcard_domain: "*.example.com"
+rancher_password: "admin"
+rancher_replicas: 2

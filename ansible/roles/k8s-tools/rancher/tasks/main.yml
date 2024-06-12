@@ -1,0 +1,50 @@
+---
+- name: Create Rancher namespace
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: cattle-system
+      spec: {}
+
+- name: Add Rancher Helm repo
+  kubernetes.core.helm_repository:
+    name: rancher-stable
+    repo_url: https://releases.rancher.com/server-charts/stable
+    force_update: true
+
+- name: Install Rancher using Helm
+  kubernetes.core.helm:
+    name: rancher
+    chart_ref: rancher-stable/rancher
+    namespace: cattle-system
+    create_namespace: true
+    values:
+      hostname: "{{ rancher_hostname }}"
+      ingress:
+        tls:
+          source: letsEncrypt
+      letsEncrypt:
+        email: "{{ letsencrypt_email }}"
+        ingress:
+          class: nginx
+      bootstrapPassword: "{{ rancher_password }}"
+      replicas: "{{ rancher_replicas }}"
+    version: "{{ rancher_version }}"
+
+- name: Verify Rancher installation
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: rancher
+        namespace: cattle-system
+      spec:
+        replicas: "{{ rancher_replicas }}"
+  register: rancher_deployment
+  until: "rancher_deployment.result.status.readyReplicas|default(0) == rancher_replicas"
+  delay: 10
+  retries: 30
+

@@ -1,0 +1,13 @@
+---
+- name: Check if kubectl is installed
+  command: kubectl version --client --short
+  register: kubectl_installed
+  failed_when: false
+  changed_when: false
+
+- name: Install kubectl
+  shell: |
+    curl -LO "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+    chmod +x kubectl
+    sudo mv kubectl /usr/local/bin/
+  when: kubectl_installed.rc != 0

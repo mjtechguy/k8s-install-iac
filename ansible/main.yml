@@ -1,0 +1,20 @@
+---
+- hosts: localhost
+  gather_facts: true
+  vars_files:
+    - inventory/group_vars/all.yml
+
+  roles:
+    - tools/kubectl
+    - tools/helm
+    - tools/k9s
+    - k3s
+    when: k8s_distro == "k3s"
+    - rke2
+    when: k8s_distro == "rke2"
+    - ingress-nginx
+    when: disable_traefik == "true"
+    - k8s-tools/cert-manager
+    - k8s-tools/rancher
+    - k8s-tools/wildcard-cert
+    - k8s-tools/reflector

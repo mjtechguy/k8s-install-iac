@@ -1,0 +1,15 @@
+---
+- name: Check if k9s is installed
+  command: k9s version --short
+  register: k9s_installed
+  failed_when: false
+  changed_when: false
+
+- name: Install k9s
+  shell: |
+    curl -Lo k9s.tar.gz "https://github.com/derailed/k9s/releases/download/{{ k9s_version }}/k9s_Linux_amd64.tar.gz"
+    tar -xzf k9s.tar.gz k9s
+    chmod +x k9s
+    sudo mv k9s /usr/local/bin/
+    rm k9s.tar.gz
+  when: k9s_installed.rc != 0

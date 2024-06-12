@@ -1,0 +1,13 @@
+---
+- name: Deploy ingress-nginx using Helm
+  kubernetes.core.helm:
+    name: ingress-nginx
+    chart_ref: ingress-nginx
+    repo_url: https://kubernetes.github.io/ingress-nginx
+    namespace: ingress-nginx
+    create_namespace: true
+    values:
+      controller:
+        replicaCount: "{{ ingress_nginx_replicas }}"
+        ingressClassResource:
+          default: true
