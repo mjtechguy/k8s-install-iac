@@ -5,16 +5,15 @@
     - inventory/group_vars/all.yml
 
   roles:
-    - tools/kubectl
-    - tools/helm
-    - tools/k9s
-    - k3s
-    when: k8s_distro == "k3s"
-    - rke2
-    when: k8s_distro == "rke2"
-    - ingress-nginx
-    when: disable_traefik == "true"
-    - k8s-tools/cert-manager
-    - k8s-tools/rancher
-    - k8s-tools/wildcard-cert
-    - k8s-tools/reflector
+    - role: tools/kubectl
+    - role: tools/helm
+    - role: tools/k9s
+    - role: k3s
+      when: k8s_distro == "k3s"
+    - role: rke2
+      when: k8s_distro == "rke2"
+    - role: ingress-nginx
+      when: disable_traefik == "true"
+    - role: k8s-tools/cert-manager
+    - role: k8s-tools/rancher
+    - role: k8s-tools/wildcard-cert
