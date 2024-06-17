@@ -1,3 +1,4 @@
+---
 - name: Create Cloudflare API key secret
   kubernetes.core.k8s:
     definition:
@@ -14,13 +15,33 @@
   delay: 10
   until: cloudflare_secret is succeeded
 
-- name: Apply ClusterIssuer
+- name: Apply Staging ClusterIssuer
   kubernetes.core.k8s:
-    definition: "{{ lookup('template', 'cluster-issuer.yml.j2') }}"
-  register: cluster_issuer
+    definition: "{{ lookup('template', 'cluster-issuer-staging.yml.j2') }}"
+  register: staging_issuer
   retries: 5
   delay: 10
-  until: cluster_issuer is succeeded
+  until: staging_issuer is succeeded
+
+- name: Apply Production ClusterIssuer
+  kubernetes.core.k8s:
+    definition: "{{ lookup('template', 'cluster-issuer-prod.yml.j2') }}"
+  register: prod_issuer
+  retries: 5
+  delay: 10
+  until: prod_issuer is succeeded
+
+- name: Delete existing wildcard certificate if changing from staging to prod
+  kubernetes.core.k8s:
+    state: absent
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: default-wildcard-tls
+        namespace: default
+  when: letsencrypt_env == 'prod' and existing_cert_info.resources[0].spec.issuerRef.name == 'letsencrypt-staging-issuer'
+  ignore_errors: true
 
 - name: Apply Wildcard Certificate
   kubernetes.core.k8s:
@@ -32,7 +53,13 @@
 
 - name: Debug ClusterIssuer creation
   debug:
-    var: cluster_issuer
+    var: staging_issuer
+  when: letsencrypt_env != 'prod'
+
+- name: Debug ClusterIssuer creation
+  debug:
+    var: prod_issuer
+  when: letsencrypt_env == 'prod'
 
 - name: Debug Wildcard Certificate creation
   debug:

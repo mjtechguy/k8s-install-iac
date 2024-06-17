@@ -11,7 +11,7 @@ spec:
       reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: ""
   secretName: default-wildcard-tls-cert
   issuerRef:
-    name: letsencrypt-dns01-issuer
+    name: "{{ 'letsencrypt-prod-issuer' if letsencrypt_env == 'prod' else 'letsencrypt-staging-issuer' }}"
     kind: ClusterIssuer
   commonName: "{{ base_domain }}"
   dnsNames:
