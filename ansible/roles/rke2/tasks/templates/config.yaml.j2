@@ -3,4 +3,3 @@ tls-san:
   {% for san in tls_sans.split(',') %}
   - "{{ san }}"
   {% endfor %}
-debug: {{ debug_mode | default('false') }}

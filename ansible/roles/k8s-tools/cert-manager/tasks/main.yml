@@ -44,11 +44,21 @@
   become: true
   when: ansible_os_family == "RedHat"
 
-- name: Ensure the kubernetes Python library is installed
-  pip:
-    name: kubernetes
-    executable: pip3
+- name: Install pip3
+  apt:
+    name: python3-pip
+    state: present
   become: true
+
+- name: Ensure the kubernetes Python library is installed using apt
+  apt:
+    name: python3-kubernetes
+    state: present
+  become: true
+
+- name: Set Python interpreter to system Python
+  set_fact:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Create cert-manager namespace
   kubernetes.core.k8s:

@@ -15,7 +15,7 @@
 
 - name: Copy kubeconfig to desired location
   copy:
-    src: "{{ kubeconfig_path | default('/etc/rancher/k3s/k3s.yaml') }}"
+    src: "{{ k3s_kubeconfig_path | default('/etc/rancher/k3s/k3s.yaml') }}"
     dest: "{{ lookup('env', 'HOME') }}/.kube/config"
     remote_src: true
     mode: '0600'

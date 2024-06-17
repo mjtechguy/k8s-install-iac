@@ -13,7 +13,7 @@
     - role: rke2
       when: k8s_distro == "rke2"
     - role: k8s-tools/ingress-nginx
-      when: disable_traefik == "true"
+      when: disable_traefik == "true" and k8s_distro == "k3s"
     - role: k8s-tools/cert-manager
     - role: k8s-tools/rancher
     - role: k8s-tools/wildcard-cert
