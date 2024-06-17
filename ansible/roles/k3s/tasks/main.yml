@@ -7,11 +7,18 @@
   register: k3s_install_result
   changed_when: k3s_install_result.rc == 0
 
+- name: Ensure $HOME/.kube directory exists
+  file:
+    path: "{{ lookup('env', 'HOME') }}/.kube"
+    state: directory
+    mode: '0600'
+
 - name: Copy kubeconfig to desired location
   copy:
     src: "{{ kubeconfig_path | default('/etc/rancher/k3s/k3s.yaml') }}"
     dest: "{{ lookup('env', 'HOME') }}/.kube/config"
     remote_src: true
+    mode: '0600'
   become: true
 
 - name: Update server IP in kubeconfig

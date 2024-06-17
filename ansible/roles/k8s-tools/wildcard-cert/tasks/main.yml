@@ -9,14 +9,34 @@
       type: Opaque
       stringData:
         api-token: "{{ cloudflare_api_key }}"
+  register: cloudflare_secret
+  retries: 5
+  delay: 10
+  until: cloudflare_secret is succeeded
 
 - name: Apply ClusterIssuer
   kubernetes.core.k8s:
     definition: "{{ lookup('template', 'cluster-issuer.yml.j2') }}"
+  register: cluster_issuer
+  retries: 5
+  delay: 10
+  until: cluster_issuer is succeeded
 
 - name: Apply Wildcard Certificate
   kubernetes.core.k8s:
     definition: "{{ lookup('template', 'wildcard-certificate.yml.j2') }}"
+  register: wildcard_certificate
+  retries: 5
+  delay: 10
+  until: wildcard_certificate is succeeded
+
+- name: Debug ClusterIssuer creation
+  debug:
+    var: cluster_issuer
+
+- name: Debug Wildcard Certificate creation
+  debug:
+    var: wildcard_certificate
 
 - name: Wait for certificate secret to be created
   kubernetes.core.k8s_info:

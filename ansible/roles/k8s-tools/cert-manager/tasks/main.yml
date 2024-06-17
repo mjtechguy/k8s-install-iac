@@ -1,25 +1,56 @@
 ---
-- name: Add cert-manager Helm repo
-  kubernetes.core.helm_repository:
-    name: jetstack
-    repo_url: https://charts.jetstack.io
-    force_update: true
+# - name: Install cert-manager using Helm
+#   kubernetes.core.helm:
+#     name: cert-manager
+#     chart_ref: jetstack/cert-manager
+#     chart_repo_url: https://charts.jetstack.io
+#     namespace: cert-manager
+#     create_namespace: true
+#     chart_version: v1.15.0
+#     values:
+#       crds:
+#         enabled: true
+#       extraArgs:
+#         - --dns01-recursive-nameservers-only
+#         - --dns01-recursive-nameservers=8.8.8.8:53\,1.1.1.1:53,1.0.0.1:53
 
-- name: Install cert-manager using Helm
-  kubernetes.core.helm:
-    name: cert-manager
-    chart_ref: jetstack/cert-manager
-    namespace: cert-manager
-    create_namespace: true
-    version: v1.15.0
-    values:
-      crds:
-        enabled: true
-      extraArgs:
-        - --dns01-recursive-nameservers-only
-        - --dns01-recursive-nameservers=8.8.8.8:53\,1.1.1.1:53,1.0.0.1:53
+# - name: Verify cert-manager installation
+#   kubernetes.core.k8s:
+#     definition:
+#       apiVersion: v1
+#       kind: Namespace
+#       metadata:
+#         name: cert-manager
+#       spec: {}
+#   register: cert_manager_namespace
 
-- name: Verify cert-manager installation
+- name: Install cert-manager CRDS
+  shell: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.0/cert-manager.crds.yaml
+
+- name: Update helm repositories
+  shell: helm repo add jetstack https://charts.jetstack.io --force-update
+
+- name: Install pip3
+  apt:
+    name: python3-pip
+    state: present
+  become: true
+  when: ansible_os_family == "Debian"
+
+- name: Install pip3
+  yum:
+    name: python3-pip
+    state: present
+  become: true
+  when: ansible_os_family == "RedHat"
+
+- name: Ensure the kubernetes Python library is installed
+  pip:
+    name: kubernetes
+    executable: pip3
+  become: true
+
+- name: Create cert-manager namespace
   kubernetes.core.k8s:
     definition:
       apiVersion: v1
@@ -27,7 +58,11 @@
       metadata:
         name: cert-manager
       spec: {}
-  register: cert_manager_namespace
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+- name: Install cert-manager using Helm
+  shell: helm upgrade --install cert-manager --namespace cert-manager --version {{ cert_manager_version }} jetstack/cert-manager
 
 - name: Wait for cert-manager deployments to be ready
   kubernetes.core.k8s_info:

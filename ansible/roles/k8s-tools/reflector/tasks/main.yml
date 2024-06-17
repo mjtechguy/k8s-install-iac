@@ -9,3 +9,5 @@
   kubernetes.core.helm:
     name: reflector
     chart_ref: emberstack/reflector
+    release_namespace: reflector-namespace
+    create_namespace: true

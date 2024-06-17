@@ -1,0 +1,27 @@
+- name: Uninstall k3s if installed
+  shell: /usr/local/bin/k3s-uninstall.sh
+  when: k8s_distro == "k3s"
+  ignore_errors: true
+
+- name: Uninstall rke2 if installed
+  shell: /usr/local/bin/rke2-uninstall.sh
+  when: k8s_distro == "rke2"
+  ignore_errors: true
+
+- name: Remove kubectl
+  file:
+    path: /usr/local/bin/kubectl
+    state: absent
+  ignore_errors: true
+
+- name: Remove helm
+  file:
+    path: /usr/local/bin/helm
+    state: absent
+  ignore_errors: true
+
+- name: Remove k9s
+  file:
+    path: /usr/local/bin/k9s
+    state: absent
+  ignore_errors: true
