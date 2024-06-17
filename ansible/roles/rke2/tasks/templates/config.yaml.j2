@@ -3,8 +3,4 @@ tls-san:
   {% for san in tls_sans.split(',') %}
   - "{{ san }}"
   {% endfor %}
-node-label:
-  {% for label in node_labels %}
-  - "{{ label }}"
-  {% endfor %}
 debug: {{ debug_mode | default('false') }}
