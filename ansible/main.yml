@@ -1,5 +1,36 @@
----
-- hosts: localhost
+- name: Cluster preparation
+  hosts: k3s_cluster
+  gather_facts: true
+  become: true
+  vars_files:
+    - inventory/group_vars/all.yml
+
+  roles:
+    - role: prereq
+      when: k8s_distro == "k3s"
+    - role: airgap
+      when: k8s_distro == "k3s"
+    - role: raspberrypi
+      when: k8s_distro == "k3s" and "'raspberrypi' in ansible_facts['devices']"
+
+- name: Setup K3S server
+  hosts: server
+  gather_facts: true
+  become: true
+  roles:
+    - role: k3s-ansible.k3s_server
+      when: k8s_distro == "k3s"
+
+- name: Setup K3S agent
+  hosts: agent
+  gather_facts: true
+  become: true
+  roles:
+    - role: k3s-ansible.k3s_agent
+      when: k8s_distro == "k3s"
+
+- name: Deploy Kubernetes tools
+  hosts: all
   gather_facts: true
   vars_files:
     - inventory/group_vars/all.yml
@@ -8,10 +39,6 @@
     - role: tools/kubectl
     - role: tools/helm
     - role: tools/k9s
-    - role: k3s
-      when: k8s_distro == "k3s"
-    - role: rke2
-      when: k8s_distro == "rke2"
     - role: k8s-tools/ingress-nginx
       when: disable_traefik == "true" and k8s_distro == "k3s"
     - role: k8s-tools/cert-manager
@@ -21,9 +48,19 @@
       when: wildcard_cert == "true"
     - role: k8s-tools/reflector
       when: reflector == "true"
+
+- name: Run additional tasks
+  hosts: all
+  gather_facts: true
+  tags: test
+  roles:
     - role: k8s-tools/test-nginx
-      tags: test
       when: "'test' in ansible_run_tags"
+
+- name: Cleanup tasks
+  hosts: all
+  gather_facts: true
+  tags: cleanup
+  roles:
     - role: cleanup
-      tags: cleanup
       when: "'cleanup' in ansible_run_tags"

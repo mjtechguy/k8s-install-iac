@@ -1,28 +1,60 @@
----
-k8s_distro: "k3s"
-k3s_version: "v1.29.12+k3s1"
-rke2_version: "v1.28.4+rke2r2"
-tls_sans: "your-server-ip,www.example.com"
-disable_traefik: "true"
-ingress_nginx_replicas: 1
-helm_version: "v3.6.3"
-kubectl_version: "v1.21.0"
-k9s_version: "v0.32.5"
-cert_manager_version: "v1.15.0"
-rancher_version: "v2.9.5"
-rancher_hostname: "rancher.example.com"
-letsencrypt_email: "admin@example.com"
-cloudflare_api_key: "your-cloudflare-api-key"
-letsencrypt_env: "prod"
-rancher_password: "admin"
-rancher_replicas: 1
-base_domain: "example.com"
-wildcard_domain: "*.example.com"
-test_nginx_domain: "test.example.com"
-ansible_python_interpreter: /usr/bin/python3
-k3s_kubeconfig_path: "/etc/rancher/k3s/k3s.yaml"
-rke2_kubeconfig_path: "/etc/rancher/rke2/rke2.yaml"
+# Global Configuration
+# --------------------
+k8s_distro: "k3s"  # Choose between "k3s" or "rke2"
 
-rancher_install: "false"
-wildcard_cert: "false"
-reflector: "false"
+# Ansible Configuration
+ansible_user: root  # Default user for SSH
+ansible_become: true  # Enable privilege escalation
+ansible_python_interpreter: /usr/bin/python3  # Path to Python interpreter
+ansible_ssh_private_key_file: "~/.ssh/id_rsa"  # Path to SSH private key
+
+# Kubernetes Versions
+k3s_version: "v1.29.12+k3s1"  # K3s version to deploy
+rke2_version: "v1.28.4+rke2r2"  # RKE2 version to deploy
+
+# TLS and Certificates
+tls_sans: "your-server-ip,www.example.com"  # Additional SANs for certificates
+disable_traefik: "true"  # Disable default Traefik in K3s (set "true" to disable)
+letsencrypt_email: "admin@example.com"  # Email for Let's Encrypt certificates
+letsencrypt_env: "prod"  # Let's Encrypt environment ("prod" or "staging")
+wildcard_cert: "false"  # Set to "true" to create a wildcard certificate
+
+# Rancher Configuration
+rancher_install: "false"  # Set to "true" to install Rancher
+rancher_chart_version: "2.9.5"  # Rancher Helm chart version
+rancher_hostname: "rancher.example.com"  # Rancher UI hostname
+rancher_password: "admin"  # Rancher admin password
+rancher_replicas: 1  # Number of Rancher replicas
+
+# Optional Features
+cert_reflector_install: "false"  # Set to "true" to install Reflector (automatic resource sync)
+
+# K3s Configuration
+# ------------------
+k3s_version: "v1.29.12+k3s1"  # K3s version to deploy
+k3s_kubeconfig_path: "/etc/rancher/k3s/k3s.yaml"  # Path to K3s kubeconfig
+k3s_extra_server_args: "--disable servicelb --disable traefik"  # Additional server arguments
+k3s_extra_agent_args: "--node-label topology.kubernetes.io/zone=us-east-1a"  # Additional agent arguments
+
+# Optional Variables for K3s (Commented Out)
+# Uncomment and configure as needed for additional customization
+
+# k3s_install_script: "https://get.k3s.io"  # Custom K3s install script URL
+# k3s_install_skip_download: false  # Skip K3s binary download during installation
+# k3s_install_binary_url: ""  # Custom URL to K3s binary
+# k3s_install_checksum: ""  # Custom checksum for the K3s binary
+# k3s_service_start: true  # Start the K3s service automatically
+# k3s_service_disable: false  # Disable K3s service
+# k3s_uninstall: false  # Uninstall K3s during playbook run
+# k3s_skip_server: false  # Skip server installation
+# k3s_skip_agent: false  # Skip agent installation
+# k3s_container_runtime_exec: ""  # Custom container runtime executable for K3s
+# k3s_container_runtime_config: ""  # Path to container runtime configuration file
+# k3s_cri_socket: ""  # Path to the container runtime socket
+# k3s_containerd_config: ""  # Path to containerd configuration file
+# k3s_node_name: ""  # Custom name for the K3s node
+# k3s_datastore_endpoint: ""  # External datastore endpoint (e.g., MySQL, PostgreSQL, etc.)
+# k3s_datastore_cafile: ""  # Path to CA file for datastore
+# k3s_datastore_certfile: ""  # Path to client cert for datastore
+# k3s_datastore_keyfile: ""  # Path to client key for datastore
+# k3s_token: "your-cluster-token"  # Cluster token for K3s
