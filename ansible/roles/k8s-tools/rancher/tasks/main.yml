@@ -79,7 +79,8 @@
       replicas: "{{ rancher_replicas }}"
       rancherImage:
         repository: rancher/rancher
-        tag: "{{ rancher_version }}"
+        tag: "{{ rancher_image_tag }}"
+    chart_version: "{{ chart_version }}"
 
 - name: Verify Rancher installation
   kubernetes.core.k8s:
