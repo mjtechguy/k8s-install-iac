@@ -45,6 +45,21 @@
 #   args:
 #     executable: /bin/bash
 
+- name: Create Rancher namespace
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: cattle-system
+      spec: {}
+
+- name: Add Rancher Helm repo
+  kubernetes.core.helm_repository:
+    name: rancher-stable
+    repo_url: https://releases.rancher.com/server-charts/stable
+    force_update: true
+
 - name: Install Rancher using Helm
   kubernetes.core.helm:
     name: rancher
@@ -53,6 +68,7 @@
     create_namespace: true
     values:
       hostname: "{{ rancher_hostname }}"
+      bootstrapPassword: "{{ rancher_password }}"
       ingress:
         tls:
           source: letsEncrypt
@@ -60,9 +76,10 @@
         email: "{{ letsencrypt_email }}"
         ingress:
           class: nginx
-      bootstrapPassword: "{{ rancher_password }}"
       replicas: "{{ rancher_replicas }}"
-    chart_version: "{{ rancher_version }}"
+      rancherImage:
+        repository: rancher/rancher
+        tag: "{{ rancher_version }}"
 
 - name: Verify Rancher installation
   kubernetes.core.k8s:
