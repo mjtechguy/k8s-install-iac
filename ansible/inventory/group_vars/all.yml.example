@@ -1,6 +1,6 @@
 ---
 k8s_distro: "k3s"
-k3s_version: "v1.28.10+k3s1"
+k3s_version: "v1.29.12+k3s1"
 rke2_version: "v1.28.4+rke2r2"
 tls_sans: "your-server-ip,www.example.com"
 disable_traefik: "true"
