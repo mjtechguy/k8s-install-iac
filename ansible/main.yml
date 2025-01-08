@@ -16,8 +16,11 @@
       when: disable_traefik == "true" and k8s_distro == "k3s"
     - role: k8s-tools/cert-manager
     - role: k8s-tools/rancher
+      when: rancher_install == "true"
     - role: k8s-tools/wildcard-cert
+      when: wildcard_cert == "true"
     - role: k8s-tools/reflector
+      when: reflector == "true"
     - role: k8s-tools/test-nginx
       tags: test
       when: "'test' in ansible_run_tags"

@@ -22,3 +22,7 @@ test_nginx_domain: "test.example.com"
 ansible_python_interpreter: /usr/bin/python3
 k3s_kubeconfig_path: "/etc/rancher/k3s/k3s.yaml"
 rke2_kubeconfig_path: "/etc/rancher/rke2/rke2.yaml"
+
+rancher_install: "false"
+wildcard_cert: "false"
+reflector: "false"
