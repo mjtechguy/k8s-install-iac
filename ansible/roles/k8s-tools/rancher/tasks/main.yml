@@ -33,18 +33,36 @@
 #       replicas: "{{ rancher_replicas }}"
 #     chart_version: "{{ rancher_version }}"
 
-- name: Install Rancher
-  shell: |
-    helm upgrade --install rancher rancher-stable/rancher \
-    --namespace cattle-system \
-    --set hostname="{{ rancher_hostname }}" \
-    --set bootstrapPassword="{{ rancher_password }}" \
-    --set ingress.tls.source=letsEncrypt \
-    --set letsEncrypt.email="{{ letsencrypt_email }}" \
-    --set letsEncrypt.ingress.class=nginx
-  args:
-    executable: /bin/bash
+# - name: Install Rancher
+#   shell: |
+#     helm upgrade --install rancher rancher-stable/rancher \
+#     --namespace cattle-system \
+#     --set hostname="{{ rancher_hostname }}" \
+#     --set bootstrapPassword="{{ rancher_password }}" \
+#     --set ingress.tls.source=letsEncrypt \
+#     --set letsEncrypt.email="{{ letsencrypt_email }}" \
+#     --set letsEncrypt.ingress.class=nginx
+#   args:
+#     executable: /bin/bash
 
+- name: Install Rancher using Helm
+  kubernetes.core.helm:
+    name: rancher
+    chart_ref: rancher-stable/rancher
+    namespace: cattle-system
+    create_namespace: true
+    values:
+      hostname: "{{ rancher_hostname }}"
+      ingress:
+        tls:
+          source: letsEncrypt
+      letsEncrypt:
+        email: "{{ letsencrypt_email }}"
+        ingress:
+          class: nginx
+      bootstrapPassword: "{{ rancher_password }}"
+      replicas: "{{ rancher_replicas }}"
+    chart_version: "{{ rancher_version }}"
 
 - name: Verify Rancher installation
   kubernetes.core.k8s:
