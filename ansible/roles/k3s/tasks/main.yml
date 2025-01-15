@@ -3,7 +3,7 @@
   shell: |
     curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -s - \
         {% if disable_traefik %}--disable traefik{% endif %} \
-        {% for san in tls_sans.split(',') %} --tls-san {{ san }}{% endfor %}
+        {% for san in tls_sans.split(',') %} --tls-san {{ san }}{% endfor %} --cluster-init
   register: k3s_install_result
   changed_when: k3s_install_result.rc == 0
 
