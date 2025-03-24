@@ -15,3 +15,14 @@ Specifically, this repository includes deploying rke2 or k3s clusters, which are
 - **reflector**: A tool to copy TLS secrets from one namespace to another in a Kubernetes cluster.
 - **Rancher**: A complete container management platform that makes it easy to deploy and manage Kubernetes clusters.
 
+## Requirements
+
+To use the Ansible playbooks in this repository, you need the following:
+
+- Linux-based operating system (Ubuntu, CentOS, etc.)
+- Ansible installed on the control node. Ansible can be installed using pip:
+  ```bash
+   ansible-install.sh
+```
+
+
